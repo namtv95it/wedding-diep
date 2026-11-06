@@ -40,29 +40,17 @@ const PREFIX_OPTIONS = [
 ];
 
 export default function QrGenerator({ weddingData, onNavigateToInvitation }) {
-  const [baseUrl, setBaseUrl] = useState(() => {
-    // 1. Nếu đang mở trực tiếp trên GitHub Pages, tự động lấy chính xác đường dẫn repo hiện tại
-    if (typeof window !== 'undefined' && window.location.hostname.includes('github.io')) {
-      let pathname = window.location.pathname
-        .replace(/\/admin\/?$/, '')
-        .replace(/\/tao-thiep\/?$/, '');
-      if (!pathname.endsWith('/')) pathname += '/';
-      const autoUrl = `${window.location.origin}${pathname}`;
-      localStorage.setItem('wedding_base_url', autoUrl);
-      return autoUrl;
-    }
+  // Tự động nhận diện: local thì dùng localhost, build/production thì dùng https://namtv95it.github.io/wedding-diep/
+  const isLocalEnv = typeof window !== 'undefined' && (
+    window.location.hostname === 'localhost' || 
+    window.location.hostname === '127.0.0.1'
+  );
 
-    // 2. Nếu đã lưu trong localStorage và không phải giá trị cũ thiếu wedding-diep
-    const saved = localStorage.getItem('wedding_base_url');
-    if (saved && saved !== 'https://namtv95it.github.io/') {
-      return saved;
-    }
+  const defaultBaseUrl = isLocalEnv 
+    ? `${window.location.origin}/` 
+    : 'https://namtv95it.github.io/wedding-diep/';
 
-    // 3. Mặc định chuẩn xác là repo wedding-diep
-    const defaultUrl = 'https://namtv95it.github.io/wedding-diep/';
-    localStorage.setItem('wedding_base_url', defaultUrl);
-    return defaultUrl;
-  });
+  const [baseUrl, setBaseUrl] = useState(defaultBaseUrl);
 
   const [guestName, setGuestName] = useState('');
   const [guestPrefix, setGuestPrefix] = useState('Trân trọng kính mời');
@@ -98,7 +86,7 @@ export default function QrGenerator({ weddingData, onNavigateToInvitation }) {
 
   // Xây dựng đường dẫn cá nhân hóa dành cho khách mời dựa trên baseUrl cấu hình
   const generateTargetUrl = (name = guestName, relation = currentRelation, prefix = guestPrefix) => {
-    let cleanBase = (baseUrl || 'https://namtv95it.github.io/').trim();
+    let cleanBase = (baseUrl || defaultBaseUrl).trim();
     if (!cleanBase.endsWith('/') && !cleanBase.includes('?')) {
       cleanBase += '/';
     }
@@ -244,14 +232,16 @@ export default function QrGenerator({ weddingData, onNavigateToInvitation }) {
                 <span>Thông Tin Khách Mời</span>
               </h2>
 
-              {/* Cài đặt URL Website đích (GitHub Pages) */}
+              {/* Cài đặt URL Website đích */}
               <div className="bg-amber-50/70 p-3.5 rounded-2xl border border-amber-200 space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-[11px] font-bold text-amber-950 uppercase tracking-wider flex items-center gap-1.5">
                     <Globe className="w-3.5 h-3.5 text-amber-700" />
-                    <span>Website Đích (GitHub Pages)</span>
+                    <span>Website Đích Gen Link & QR</span>
                   </label>
-                  <span className="text-[10px] text-amber-800 font-medium">Dùng để gen link & QR</span>
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-200/80 text-amber-900">
+                    {isLocalEnv ? '⚡ Tự động: Localhost' : '🌐 Tự động: GitHub Pages'}
+                  </span>
                 </div>
 
                 <input
