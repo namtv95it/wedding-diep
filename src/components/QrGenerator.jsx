@@ -47,8 +47,8 @@ export default function QrGenerator({ weddingData, onNavigateToInvitation }) {
   );
 
   const defaultBaseUrl = isLocalEnv 
-    ? `${window.location.origin}/` 
-    : 'https://namtv95it.github.io/wedding-diep/';
+    ? window.location.origin 
+    : 'https://namtv95it.github.io/wedding-diep';
 
   const [baseUrl, setBaseUrl] = useState(defaultBaseUrl);
 
@@ -84,12 +84,11 @@ export default function QrGenerator({ weddingData, onNavigateToInvitation }) {
   // Tính quan hệ cuối cùng
   const currentRelation = useCustomRelation ? customRelation.trim() : guestRelation;
 
-  // Xây dựng đường dẫn cá nhân hóa dành cho khách mời dựa trên baseUrl cấu hình
+  // Xây dựng đường dẫn cá nhân hóa dành cho khách mời (bỏ dấu / ở cuối)
   const generateTargetUrl = (name = guestName, relation = currentRelation, prefix = guestPrefix) => {
     let cleanBase = (baseUrl || defaultBaseUrl).trim();
-    if (!cleanBase.endsWith('/') && !cleanBase.includes('?')) {
-      cleanBase += '/';
-    }
+    // Bỏ tất cả dấu / ở cuối đường dẫn (ví dụ: wedding-diep/ -> wedding-diep)
+    cleanBase = cleanBase.replace(/\/+$/, '');
 
     const params = new URLSearchParams();
     if (name.trim()) params.set('to', name.trim());
@@ -99,9 +98,7 @@ export default function QrGenerator({ weddingData, onNavigateToInvitation }) {
     const queryString = params.toString();
     if (!queryString) return cleanBase;
 
-    return cleanBase.includes('?') 
-      ? `${cleanBase}&${queryString}` 
-      : `${cleanBase}?${queryString}`;
+    return `${cleanBase}?${queryString}`;
   };
 
   const targetUrl = generateTargetUrl();
@@ -231,59 +228,6 @@ export default function QrGenerator({ weddingData, onNavigateToInvitation }) {
                 <Users className="w-5 h-5 text-amber-700" />
                 <span>Thông Tin Khách Mời</span>
               </h2>
-
-              {/* Cài đặt URL Website đích */}
-              {/* <div className="bg-amber-50/70 p-3.5 rounded-2xl border border-amber-200 space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-[11px] font-bold text-amber-950 uppercase tracking-wider flex items-center gap-1.5">
-                    <Globe className="w-3.5 h-3.5 text-amber-700" />
-                    <span>Website Đích Gen Link & QR</span>
-                  </label>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-200/80 text-amber-900">
-                    {isLocalEnv ? '⚡ Tự động: Localhost' : '🌐 Tự động: GitHub Pages'}
-                  </span>
-                </div>
-
-                <input
-                  type="text"
-                  value={baseUrl}
-                  onChange={(e) => handleUpdateBaseUrl(e.target.value)}
-                  placeholder="https://namtv95it.github.io/wedding-diep/"
-                  className="w-full px-3 py-1.5 rounded-xl border border-amber-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/50 text-xs font-mono text-stone-700"
-                />
-
-                <div className="flex flex-wrap gap-1.5 pt-0.5">
-                  <button
-                    type="button"
-                    onClick={() => handleUpdateBaseUrl('https://namtv95it.github.io/wedding-diep/')}
-                    className={`px-2 py-1 rounded-lg text-[10px] font-medium border transition ${
-                      baseUrl === 'https://namtv95it.github.io/wedding-diep/'
-                        ? 'bg-amber-800 text-white border-amber-900'
-                        : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50'
-                    }`}
-                  >
-                    ✓ namtv95it.github.io/wedding-diep/
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleUpdateBaseUrl('https://namtv95it.github.io/')}
-                    className={`px-2 py-1 rounded-lg text-[10px] font-medium border transition ${
-                      baseUrl === 'https://namtv95it.github.io/'
-                        ? 'bg-amber-800 text-white border-amber-900'
-                        : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50'
-                    }`}
-                  >
-                    namtv95it.github.io (gốc)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleUpdateBaseUrl(`${window.location.origin}/`)}
-                    className="px-2 py-1 rounded-lg text-[10px] font-medium bg-white text-stone-500 border border-stone-200 hover:bg-stone-50"
-                  >
-                    localhost (test)
-                  </button>
-                </div>
-              </div> */}
 
               {/* Lời xưng hô */}
               <div>
