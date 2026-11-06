@@ -41,7 +41,27 @@ const PREFIX_OPTIONS = [
 
 export default function QrGenerator({ weddingData, onNavigateToInvitation }) {
   const [baseUrl, setBaseUrl] = useState(() => {
-    return localStorage.getItem('wedding_base_url') || 'https://namtv95it.github.io/';
+    // 1. Nếu đang mở trực tiếp trên GitHub Pages, tự động lấy chính xác đường dẫn repo hiện tại
+    if (typeof window !== 'undefined' && window.location.hostname.includes('github.io')) {
+      let pathname = window.location.pathname
+        .replace(/\/admin\/?$/, '')
+        .replace(/\/tao-thiep\/?$/, '');
+      if (!pathname.endsWith('/')) pathname += '/';
+      const autoUrl = `${window.location.origin}${pathname}`;
+      localStorage.setItem('wedding_base_url', autoUrl);
+      return autoUrl;
+    }
+
+    // 2. Nếu đã lưu trong localStorage và không phải giá trị cũ thiếu wedding-diep
+    const saved = localStorage.getItem('wedding_base_url');
+    if (saved && saved !== 'https://namtv95it.github.io/') {
+      return saved;
+    }
+
+    // 3. Mặc định chuẩn xác là repo wedding-diep
+    const defaultUrl = 'https://namtv95it.github.io/wedding-diep/';
+    localStorage.setItem('wedding_base_url', defaultUrl);
+    return defaultUrl;
   });
 
   const [guestName, setGuestName] = useState('');
@@ -238,22 +258,11 @@ export default function QrGenerator({ weddingData, onNavigateToInvitation }) {
                   type="text"
                   value={baseUrl}
                   onChange={(e) => handleUpdateBaseUrl(e.target.value)}
-                  placeholder="https://namtv95it.github.io/"
+                  placeholder="https://namtv95it.github.io/wedding-diep/"
                   className="w-full px-3 py-1.5 rounded-xl border border-amber-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/50 text-xs font-mono text-stone-700"
                 />
 
                 <div className="flex flex-wrap gap-1.5 pt-0.5">
-                  <button
-                    type="button"
-                    onClick={() => handleUpdateBaseUrl('https://namtv95it.github.io/')}
-                    className={`px-2 py-1 rounded-lg text-[10px] font-medium border transition ${
-                      baseUrl === 'https://namtv95it.github.io/'
-                        ? 'bg-amber-800 text-white border-amber-900'
-                        : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50'
-                    }`}
-                  >
-                    ✓ namtv95it.github.io
-                  </button>
                   <button
                     type="button"
                     onClick={() => handleUpdateBaseUrl('https://namtv95it.github.io/wedding-diep/')}
@@ -263,7 +272,18 @@ export default function QrGenerator({ weddingData, onNavigateToInvitation }) {
                         : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50'
                     }`}
                   >
-                    repo /wedding-diep/
+                    ✓ namtv95it.github.io/wedding-diep/
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleUpdateBaseUrl('https://namtv95it.github.io/')}
+                    className={`px-2 py-1 rounded-lg text-[10px] font-medium border transition ${
+                      baseUrl === 'https://namtv95it.github.io/'
+                        ? 'bg-amber-800 text-white border-amber-900'
+                        : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50'
+                    }`}
+                  >
+                    namtv95it.github.io (gốc)
                   </button>
                   <button
                     type="button"
