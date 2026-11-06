@@ -233,7 +233,7 @@ export default function QrGenerator({ weddingData, onNavigateToInvitation }) {
               </h2>
 
               {/* Cài đặt URL Website đích */}
-              <div className="bg-amber-50/70 p-3.5 rounded-2xl border border-amber-200 space-y-2">
+              {/* <div className="bg-amber-50/70 p-3.5 rounded-2xl border border-amber-200 space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-[11px] font-bold text-amber-950 uppercase tracking-wider flex items-center gap-1.5">
                     <Globe className="w-3.5 h-3.5 text-amber-700" />
@@ -283,7 +283,7 @@ export default function QrGenerator({ weddingData, onNavigateToInvitation }) {
                     localhost (test)
                   </button>
                 </div>
-              </div>
+              </div> */}
 
               {/* Lời xưng hô */}
               <div>
